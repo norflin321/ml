@@ -1,8 +1,9 @@
+import utils
 import torch
 import torchvision
 from torchmetrics import Accuracy
 from torch.utils.data import DataLoader
-import utils
+from timeit import default_timer as timer
 
 torchmetric_acc = Accuracy()
 
@@ -21,8 +22,10 @@ label = data_tr.classes[label_idx]
 # utils.plot_img(img, label)
 
 # divide data to batches by 32 items (60000/32 = 1875, 10000/32 = 313)
-data_bch_tr = DataLoader(data_tr, 32)
-data_bch_te = DataLoader(data_te, 32)
+# now training loop will upload in memory only 32 images at a time, instead of 60k
+BATCH_SIZE = 32
+data_bch_tr = DataLoader(data_tr, BATCH_SIZE)
+data_bch_te = DataLoader(data_te, BATCH_SIZE)
 print(len(data_bch_tr), len(data_bch_te))
 
 # get tensors from dataloader type
@@ -48,3 +51,48 @@ torch.manual_seed(42)
 model = Model(28*28, 10, len(data_tr.classes))
 state = model.state_dict()
 utils.print_state(state)
+
+### Training Loop
+torch.manual_seed(42)
+
+loss_fn = torch.nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(params=model.parameters(), lr=0.1)
+
+epochs = 3
+start_time = timer()
+for epoch in range(epochs):
+    print(f"--- Epoch: {epoch}")
+    train_loss = 0
+    # loop trough the training batches
+    for batch_number, (x, y) in enumerate(data_bch_tr):
+        model.train()
+        y_pred = model(x) # 1. forward pass
+        loss = loss_fn(y_pred, y) # 2. calculate loss
+        train_loss += loss
+        optimizer.zero_grad() # 3. optimizer zero grad
+        loss.backward() # 4. back propagation
+        optimizer.step() # 5. optimizer step
+        if batch_number % 400 == 0:
+            print(f"Looked at {batch_number * len(x)} of {len(data_bch_tr) * BATCH_SIZE} samples")
+
+    # calculate avg loss per batch
+    train_loss /= len(data_bch_tr)
+
+    # loop through the testing batches
+    test_loss, test_accuracy = 0, 0
+    model.eval()
+    with torch.inference_mode():
+        for x, y in data_bch_te:
+            y_pred = model(x)
+            test_loss += loss_fn(y_pred, y)
+            test_accuracy += utils.accuracy_fn(y_pred.argmax(dim=1), y)
+
+        # calculate avg loss per batch
+        test_loss /= len(data_bch_te)
+        # calculate avg accuracy per batch
+        test_accuracy /= len(data_bch_te)
+
+    print(f"train loss: {train_loss:.4f}, test loss: {test_loss:.4f}, test_accuracy: {test_accuracy:.4f}")
+
+end_time = timer()
+utils.print_time_diff(start_time, end_time)
