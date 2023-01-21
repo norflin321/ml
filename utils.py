@@ -149,6 +149,7 @@ def download_data(source: str, destination: str, remove_source: bool = True) -> 
             os.remove(data_path / target_file)
     return image_path
 
+###
 def plot_img(img, title):
     plt.imshow(img.squeeze(), cmap="gray")
     plt.title(title)
@@ -156,6 +157,7 @@ def plot_img(img, title):
     plt.savefig("img_plot.png")
     subprocess.call(["open", "img_plot.png"])
 
+###
 def print_state(state):
     for k, v in state.items():
         print(f"--- {k}:")
