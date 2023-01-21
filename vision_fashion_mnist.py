@@ -22,7 +22,7 @@ label = data_tr.classes[label_idx]
 # utils.plot_img(img, label)
 
 # divide data to batches by 32 items (60000/32 = 1875, 10000/32 = 313)
-# now training loop will upload in memory only 32 images at a time, instead of 60k
+# so training loop will upload in memory only 32 images at a time, instead of 60k
 BATCH_SIZE = 32
 data_bch_tr = DataLoader(data_tr, BATCH_SIZE)
 data_bch_te = DataLoader(data_te, BATCH_SIZE)
@@ -50,7 +50,7 @@ class Model(torch.nn.Module):
 torch.manual_seed(42)
 model = Model(28*28, 10, len(data_tr.classes))
 state = model.state_dict()
-utils.print_state(state)
+# utils.print_state(state)
 
 ### Training Loop
 torch.manual_seed(42)
@@ -58,10 +58,9 @@ torch.manual_seed(42)
 loss_fn = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(params=model.parameters(), lr=0.1)
 
-epochs = 3
+epochs = 20
 start_time = timer()
 for epoch in range(epochs):
-    print(f"--- Epoch: {epoch}")
     train_loss = 0
     # loop trough the training batches
     for batch_number, (x, y) in enumerate(data_bch_tr):
@@ -72,8 +71,6 @@ for epoch in range(epochs):
         optimizer.zero_grad() # 3. optimizer zero grad
         loss.backward() # 4. back propagation
         optimizer.step() # 5. optimizer step
-        if batch_number % 400 == 0:
-            print(f"Looked at {batch_number * len(x)} of {len(data_bch_tr) * BATCH_SIZE} samples")
 
     # calculate avg loss per batch
     train_loss /= len(data_bch_tr)
@@ -92,7 +89,7 @@ for epoch in range(epochs):
         # calculate avg accuracy per batch
         test_accuracy /= len(data_bch_te)
 
-    print(f"train loss: {train_loss:.4f}, test loss: {test_loss:.4f}, test_accuracy: {test_accuracy:.4f}")
+    print(f"epoch {epoch}, train loss: {train_loss:.4f}, test loss: {test_loss:.4f}, test_accuracy: {test_accuracy:.4f}")
 
 end_time = timer()
 utils.print_time_diff(start_time, end_time)
