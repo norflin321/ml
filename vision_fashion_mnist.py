@@ -43,7 +43,11 @@ class Model(torch.nn.Module):
         self.layer_stack = torch.nn.Sequential(
             torch.nn.Flatten(), # important! we want to compress the image into a vector (height * width = 28 * 28 = 784)
             torch.nn.Linear(in_features=input_shape, out_features=hidden_units),
-            torch.nn.Linear(in_features=hidden_units, out_features=output_shape))
+            torch.nn.ReLU(),
+            torch.nn.Linear(in_features=hidden_units, out_features=hidden_units),
+            torch.nn.ReLU(),
+            torch.nn.Linear(in_features=hidden_units, out_features=output_shape),
+        )
     def forward(self, x):
         return self.layer_stack(x)
 
@@ -58,8 +62,9 @@ torch.manual_seed(42)
 loss_fn = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(params=model.parameters(), lr=0.1)
 
-epochs = 20
+epochs = 50
 start_time = timer()
+prev_test_accuracy = 0
 for epoch in range(epochs):
     train_loss = 0
     # loop trough the training batches
@@ -89,7 +94,9 @@ for epoch in range(epochs):
         # calculate avg accuracy per batch
         test_accuracy /= len(data_bch_te)
 
-    print(f"epoch {epoch}, train loss: {train_loss:.4f}, test loss: {test_loss:.4f}, test_accuracy: {test_accuracy:.4f}")
+    test_accuracy_change = test_accuracy - prev_test_accuracy
+    print(f"epoch {epoch:03d}, train_loss: {train_loss:.4f}, test_loss: {test_loss:.4f}, test_accuracy: {test_accuracy:.4f} ({test_accuracy_change:.4f})")
+    prev_test_accuracy = test_accuracy
 
 end_time = timer()
 utils.print_time_diff(start_time, end_time)
