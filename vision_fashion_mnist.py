@@ -63,7 +63,7 @@ start_time = timer()
 for epoch in range(epochs):
     train_loss = 0
     # loop trough the training batches
-    for batch_number, (x, y) in enumerate(data_bch_tr):
+    for x, y in data_bch_tr:
         model.train()
         y_pred = model(x) # 1. forward pass
         loss = loss_fn(y_pred, y) # 2. calculate loss
