@@ -17,8 +17,8 @@ stoi = { ch:i for i,ch in enumerate(chars) }
 itos = { i:ch for i,ch in enumerate(chars) }
 encode = lambda s: [stoi[c] for c in s]
 decode = lambda l: "".join([itos[i] for i in l])
-print(encode("anton"))
-print(decode(encode("anton")))
+print(itos)
+print(encode("anton"), decode(encode("anton")))
 
 # let's now encode the entire text dataset and store it into a torch.tensor
 data = torch.tensor(encode(text), dtype=torch.long)
@@ -42,7 +42,7 @@ def get_batch(split):
     return x, y
 
 xb, yb = get_batch("train")
-print("inputs:")
+print("\ninputs:")
 print(xb.shape)
 print(xb)
 print("targets:")
@@ -54,7 +54,6 @@ for b in range(batch_size): # batch dimension
         context = xb[b, :t+1]
         target = yb[b, t]
         print(f"when input is {context.tolist()} the target: {target}")
-
 
 torch.manual_seed(1337)
 class BigramLanguageModel(torch.nn.Module):
@@ -70,8 +69,23 @@ class BigramLanguageModel(torch.nn.Module):
         targets = targets.view(b*t)
         loss = fun.cross_entropy(logits, targets)
         return logits, loss
+    def generate(self, idx, max_new_tokens):
+        # idx is (b, t) array of indices in the current context
+        for _ in range(max_new_tokens):
+            # get the predictions
+            logits, loss = self(idx)
+            # focus only on the last time step
+            logits = logits[:, -1, :] # becomes (b, c)
+            # apply softmax to get probabilities
+            probs = fun.softmax(logits, dim=1) # (b, c)
+            # sample from distribution
+            idx_next = torch.multinomial(probs, num_samples=1) # (b, 1)
+            # append sampled index to the running sequence
+            idx = torch.cat((idx, idx_next), dim=1) # (b, t+1)
+        return idx
 
 m = BigramLanguageModel(vocab_size)
 logits, loss = m(xb, yb)
+print("\n")
 print(logits.shape)
 print(loss)
