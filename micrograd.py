@@ -25,13 +25,64 @@ class Value:
     def __repr__(self):
         return f"Value(data={self.data})"
     def __add__(self, other):
-        return Value(self.data + other.data, (self, other), "+")
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data + other.data, (self, other), "+")
+        def _backward():
+            self.grad += 1.0 * out.grad
+            other.grad += 1.0 * out.grad
+        out._backward = _backward
+        return out
     def __mul__(self, other):
-        return Value(self.data * other.data, (self, other), "*")
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data * other.data, (self, other), "*")
+        def _backward():
+            self.grad += other.data * out.grad
+            other.grad += self.data * out.grad
+        out._backward = _backward
+        return out
+    def __pow__(self, other):
+        assert isinstance(other, (int, float)), "only supporting int/float powers now"
+        out = Value(self.data**other, (self,), f"**{other}")
+        def _backward():
+            self.grad += other * (self.data ** (other - 1)) * out.grad
+        out._backward = _backward
+        return out
+    def __rmul__(self, other):
+        return other * self
+    def __truediv__(self, other):
+        return self * other**-1
+    def __neg__(self):
+        return self * -1
+    def __sub__(self, other):
+        return self + (-other)
+    def exp(self):
+        x = self.data
+        out = Value(math.exp(x), (self, ), "exp")
+        def _backward():
+            self.grad += out.data * out.grad
+        out._backward = _backward
+        return out
     def tanh(self):
         x = self.data
         t = (math.exp(2*x) - 1) / (math.exp(2*x) + 1)
-        return Value(t, (self, ), "tanh")
+        out = Value(t, (self, ), "tanh")
+        def _backward():
+            self.grad += (1 - t**2) * out.grad
+        out._backward = _backward
+        return out
+    def backward(self):
+        # we don't want to call _backward for any node before we have done everything after it
+        # this ordering of graphs can be achieved using "topological sort"
+        topo = []
+        visited = set()
+        def build_topo(v):
+            if v not in visited:
+                visited.add(v)
+                for child in v._prev: build_topo(child)
+                topo.append(v)
+        build_topo(self)
+        self.grad = 1.0
+        for node in reversed(topo): node._backward();
 
 # so we have multiple inputs here going into a methematical expression, that
 # produces a single output (l), and function "draw_dot" is visualizing this "forward pass"
@@ -42,7 +93,7 @@ f = Value(-2.0, label="f")
 e = a * b; e.label = "e"
 d = c + e; d.label = "d"
 l = d * f; l.label = "l"
-print(l, l._prev, l._op)
+# print(l, l._prev, l._op)
 # next we would like to run "backpropagation". we are going to start at the end (l),
 # and going backwards, calculate the "gradient" along all these intermediate values.
 # which means to compute the derivative of each node (a, b, c, f, e, d) with respect to (l).
@@ -82,7 +133,6 @@ e.grad = -2.0
 a.grad = -2.0 * -3.0
 b.grad = -2.0 * 2.0
 # draw_dot(l).render(".tmp/dot1")
-# open .tmp/dot1
 
 ## Neuron
 # open docs/neuron.jpeg
@@ -112,9 +162,16 @@ x2w2 = x2*w2; x2w2.label = "x2*w2"
 x1w1x2w2 = x1w1 + x2w2; x1w1x2w2.label = "x1*w1 + x2*w2"
 n = x1w1x2w2 + b; n.label = "n"
 o = n.tanh(); o.label = "o"
+o.backward()
 draw_dot(o).render(".tmp/dot2")
 
-# open .tmp/dot2
-# now we are going to do "backpropagation" and fill in all the gradients.
-# in a typical neural network setting, we mostly care bout derivatives of weights (w1, w2).
-# because we are going to change them as part of the optimization
+## Implement a simple NN
+class Neuron:
+    def __init__(self, nin): # nin - how many inputs come to a neuron
+        # weight - a random number between -1 and 1, for every one of inputs to a neuron
+        self.w = [Value(random.uniform(-1,1)) for _ in range(nin)]
+        # bias - a random number between -1 and 1, that controls the overall trigger heppiness of this neuron
+        self.b = Value(random.uniform(-1,1))
+
+
+# https://youtu.be/VMj-3S1tku0?t=6368
