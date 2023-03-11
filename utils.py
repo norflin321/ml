@@ -51,7 +51,7 @@ def plot_predictions(train_data, train_labels, test_data, test_labels, predictio
     plt.legend(prop={"size": 14})
 
 ### Calculates accuracy between truth labels and predictions (a classification metric)
-def accuracy_fn(y_pred: torch.Tensor, y_true: torch.Tensor,) -> float:
+def accuracy_fn(y_pred: torch.Tensor, y_true: torch.Tensor) -> float:
     correct = torch.eq(y_true, y_pred).sum().item()
     acc = (correct / len(y_pred)) * 100
     return round(acc) # accuracy value between y_true and y_pred

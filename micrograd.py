@@ -47,8 +47,6 @@ class Value:
             self.grad += other * (self.data ** (other - 1)) * out.grad
         out._backward = _backward
         return out
-    def __rmul__(self, other):
-        return other * self
     def __truediv__(self, other):
         return self * other**-1
     def __neg__(self):
@@ -70,6 +68,12 @@ class Value:
             self.grad += (1 - t**2) * out.grad
         out._backward = _backward
         return out
+    def __radd__(self, other):
+        return self + other
+    def __rsub__(self, other):
+        return other + (-self)
+    def __rmul__(self, other):
+        return other * self
     def backward(self):
         # we don't want to call _backward for any node before we have done everything after it
         # this ordering of graphs can be achieved using "topological sort"
@@ -138,40 +142,94 @@ b.grad = -2.0 * 2.0
 # open docs/neuron.jpeg
 # You have some inputs (x) and synapses that have weights (w) on them.
 # The synapse interacts with the input (x) to this neuron multiplicatively, so what flows to the
-# cell body of this neuron is (w*x). But there is multiple inputs (w*x) flowing to the cell body.
+# cell body of this neuron is (w * x). But there is multiple inputs (w * x) flowing to the cell body.
 #
 # The cell body also has some bias (b) which can make input, a bit more or a bit less,
 # regardless of the input.
 #
-# Basically we are taking all the (w*x) of all the inputs, adding the bias (b), and then
+# Basically we are taking all the (w * x) of all the inputs, adding the bias (b), and then
 # we take it through an activaction function. Which is usually some kind of
 # squashing function like a Sigmoid or 10h.
 # open docs/fn_10h.png
 
-# inputs x1, x2
-x1 = Value(2.0, label="x1")
-x2 = Value(0.0, label="x2")
-# weights w1, w2 (synaptic strengths for each input)
-w1 = Value(-3.0, label="w1")
-w2 = Value(1.0, label="w2")
-# bias of the neuron
-b = Value(6.8813735870195432, label="b")
-# x1*w1 + x2*w2 + b
-x1w1 = x1*w1; x1w1.label = "x1*w1"
-x2w2 = x2*w2; x2w2.label = "x2*w2"
-x1w1x2w2 = x1w1 + x2w2; x1w1x2w2.label = "x1*w1 + x2*w2"
-n = x1w1x2w2 + b; n.label = "n"
-o = n.tanh(); o.label = "o"
-o.backward()
-draw_dot(o).render(".tmp/dot2")
-
-## Implement a simple NN
+## Model Implementation
 class Neuron:
-    def __init__(self, nin): # nin - how many inputs come to a neuron
+    # nin - number of inputs to a neuron
+    def __init__(self, nin):
         # weight - a random number between -1 and 1, for every one of inputs to a neuron
-        self.w = [Value(random.uniform(-1,1)) for _ in range(nin)]
+        self.w = [Value(np.random.uniform(-1,1)) for _ in range(nin)]
         # bias - a random number between -1 and 1, that controls the overall trigger heppiness of this neuron
-        self.b = Value(random.uniform(-1,1))
+        self.b = Value(np.random.uniform(-1,1))
+    def __call__(self, x):
+        # w * x + b
+        act = sum((wi*xi for wi, xi in zip(self.w, x)), self.b)
+        out = act.tanh()
+        return out
+    def parameters(self):
+        return self.w + [self.b]
 
+class Layer:
+    # nin - number of inputs to a layer
+    # nout - number of neurons in a single layer
+    def __init__(self, nin, nout):
+        self.neurons = [Neuron(nin) for _ in range(nout)]
+    def __call__(self, x):
+        outs = [n(x) for n in self.neurons]
+        return outs[0] if len(outs) == 1 else outs
+    def parameters(self):
+        params = []
+        for neuron in self.neurons:
+            ps = neuron.parameters()
+            params += ps
+        return params
 
-# https://youtu.be/VMj-3S1tku0?t=6368
+class MLP:
+    # nin - number of inputs to MLP (first layer)
+    # nouts - list of numbers of neurons in a layer
+    def __init__(self, nin, nouts):
+        arr = [nin] + nouts # concat 2 lists
+        self.layers = [Layer(arr[i], arr[i+1]) for i in range(len(nouts))]
+        # self.layers = [Layer(3, 4), Layer(4, 4), Layer(4, 1)]
+    def __call__(self, x):
+        for layer in self.layers:
+            x = layer(x)
+        return x
+    def parameters(self): # returns all the weights and biases from inside each node of entire nn
+        params = []
+        for layer in self.layers:
+            ps = layer.parameters()
+            params += ps
+        return params
+
+## Binary Classification (-1.0 or 1.0)
+xs = [
+    [2.0, 3.0, -1.0], # target: 1.0
+    [3.0, -1.0, 0.5], # target: -1.0
+    [0.5, 1.0, 1.0],  # target: -1.0
+    [1.0, 1.0, -1.0], # target: 1.0
+]
+ys = [1.0, -1.0, -1.0, 1.0] # desired targets
+
+model = MLP(3, [4, 4, 1])
+
+steps = 500
+ypred = []
+for k in range(steps):
+    ## forward pass
+    ypred = [model(x) for x in xs] # ypred is not quite accurate
+    # so how do we tune the weights to better predict the desired targets?
+    # loss measures the total performance of nn
+    ## calculate loss (using simple mean square error loss)
+    loss = sum([(yout - ygt)**2 for ygt, yout in zip(ys, ypred)]) # pyright: reportGeneralTypeIssues=false
+    ## backward pass (calculate gradients), but do zero grad before
+    for p in model.parameters():
+        p.grad = 0.0
+    loss.backward()
+    ## update (using simple stochastic gradient descent)
+    for p in model.parameters():
+        p.data += -0.1 * p.grad
+    ## print loss
+    if k % (steps/10) == 0:
+        print(k, loss.data)
+
+for i in ypred: print(i)
