@@ -152,7 +152,7 @@ b.grad = -2.0 * 2.0
 # squashing function like a Sigmoid or 10h.
 # open docs/fn_10h.png
 
-## Model Implementation
+## Implement Multilayer Perceptron (MLP) model
 class Neuron:
     # nin - number of inputs to a neuron
     def __init__(self, nin):
