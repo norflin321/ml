@@ -4,4 +4,4 @@ env
 .tmp
 
 # Data
-data/FashionMNIST
+datasets/FashionMNIST
