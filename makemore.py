@@ -3,10 +3,10 @@ import torch.nn.functional as f
 
 words = open("datasets/names.txt", "r").read().splitlines()
 
-## create encoding table
+## build the vocabulary of caracters and mappings to/from integers
 chars = sorted(list(set(''.join(words))))
 stoi = {s:i+1 for i,s in enumerate(chars)}
-stoi['.'] = 0
+stoi["."] = 0
 itos = {i:s for s,i in stoi.items()}
 
 ## encode words in indexes from table and create training set of bigrams (x,y)
