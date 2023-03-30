@@ -36,3 +36,5 @@ conda deactivate
   conda install pandas numpy matplotlib scikit-learn pydot pydotplus tqdm
   ```
 </details>
+
+- https://colab.research.google.com/github/ - open any notebook from github in colab select GPU and train faster
