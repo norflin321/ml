@@ -1,6 +1,7 @@
 <p float="left">
-  <img src="https://user-images.githubusercontent.com/33498670/229221502-d72c1ead-d4f1-43c9-b1df-24b8b2077b3d.jpeg" width="49%" /> 
-  <img src="https://user-images.githubusercontent.com/33498670/229221488-e26f0ba6-9c90-4aeb-9b8e-afad4c41be6a.jpg" width="49%" />
+  <img src="https://user-images.githubusercontent.com/33498670/229229299-f8922872-1f2d-42a5-a1ae-b853b5a71072.jpg" width="32%" />
+  <img src="https://user-images.githubusercontent.com/33498670/229221502-d72c1ead-d4f1-43c9-b1df-24b8b2077b3d.jpeg" width="32%" />
+  <img src="https://user-images.githubusercontent.com/33498670/229221488-e26f0ba6-9c90-4aeb-9b8e-afad4c41be6a.jpg" width="32%" />
 </p>
 
 ```bash
