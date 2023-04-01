@@ -1,6 +1,12 @@
-To run/train models on an Apple Silicon GPU, use the PyTorch device name "mps" with .to("mps"). [MPS](https://pytorch.org/docs/master/notes/mps.html) stands for Metal Performance Shaders, [Metal](https://developer.apple.com/metal/pytorch/) is Apple's GPU framework.
+<p float="left">
+  <img src="https://user-images.githubusercontent.com/33498670/229221502-d72c1ead-d4f1-43c9-b1df-24b8b2077b3d.jpeg" width="49%" />
+  <img src="https://user-images.githubusercontent.com/33498670/229221488-e26f0ba6-9c90-4aeb-9b8e-afad4c41be6a.jpg" width="49%" />
+  <img src="https://user-images.githubusercontent.com/33498670/229244426-11fdefca-9163-4605-8005-342bde983f1d.jpeg" width="49%" />
+  <img src="https://user-images.githubusercontent.com/33498670/229244752-000f8b6f-01b2-4946-af72-143807c622f2.jpeg" width="49%" />
+</p>
 
 ```bash
+
 conda activate ./env
 
 python <file>
