@@ -5,12 +5,16 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-# notes:
-# - Attention is All You Need (https://arxiv.org/abs/1706.03762)
-# - training is very very slow on non gpu devices! (use colab)
+# Attention is All You Need (https://arxiv.org/abs/1706.03762)
 
-# todo:
-# [.] implement ability to save/load parameters
+# This is a GPT language model without fine tuning. If you want something that is not
+# just a document completer, you have to fine tune it, which are not covered here.
+#
+# That can be simple supervised fine tuning or it can be something more fancy like
+# training a reward model and then do rounds of PPO to align the GPT model with
+# respect to that reward model.
+#
+# There is a lot more that can be done on top of it.
 
 # hyperparameters
 batch_size = 64 # how many independent sequences will we process in parallel?
@@ -25,6 +29,8 @@ n_head = 6
 n_layer = 6
 dropout = 0.2
 # ------------
+
+# training is very very slow on non gpu devices! (use colab)
 
 torch.manual_seed(1337)
 
