@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
+# Visual illustration of the algorithm: https://youtu.be/d7IRM40VMYM
+
 # Attention is All You Need (https://arxiv.org/abs/1706.03762)
 
 # This is a GPT language model without fine tuning. If you want something that is not
