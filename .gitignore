@@ -2,6 +2,5 @@
 __pycache__
 env
 .tmp
-
-# Data
 datasets/FashionMNIST
+.ipynb_checkpoints

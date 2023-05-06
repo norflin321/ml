@@ -156,14 +156,15 @@ b.grad = -2.0 * 2.0
 class Neuron:
     # nin - number of inputs to a neuron
     def __init__(self, nin):
-        # weight - a random number between -1 and 1, for every one of inputs to a neuron
+        # weight is an array, with just a random number between -1 and 1 for every one of input number (2.0, 3.0, -1.0)
         self.w = [Value(np.random.uniform(-1,1)) for _ in range(nin)]
-        # bias - a random number between -1 and 1, that controls the overall trigger heppiness of this neuron
+        # bias is a random number between -1 and 1, that represents the overall trigger heppiness of this neuron
         self.b = Value(np.random.uniform(-1,1))
     def __call__(self, x):
-        # w * x + b
-        act = sum((wi*xi for wi, xi in zip(self.w, x)), self.b)
-        out = act.tanh()
+        # (w * x) + b
+        out = (wi * xi for wi, xi in zip(self.w, x))
+        out = sum(out, self.b)
+        out = out.tanh() # activation function
         return out
     def parameters(self):
         return self.w + [self.b]
@@ -174,7 +175,7 @@ class Layer:
     def __init__(self, nin, nout):
         self.neurons = [Neuron(nin) for _ in range(nout)]
     def __call__(self, x):
-        outs = [n(x) for n in self.neurons]
+        outs = [n(x) for n in self.neurons] # x = xs[i]
         return outs[0] if len(outs) == 1 else outs
     def parameters(self):
         params = []
@@ -184,17 +185,16 @@ class Layer:
         return params
 
 class MLP:
-    # nin - number of inputs to MLP (first layer)
+    # nin - number of inputs to a layer
     # nouts - list of numbers of neurons in a layer
     def __init__(self, nin, nouts):
         arr = [nin] + nouts # concat 2 lists
-        self.layers = [Layer(arr[i], arr[i+1]) for i in range(len(nouts))]
-        # self.layers = [Layer(3, 4), Layer(4, 4), Layer(4, 1)]
+        self.layers = [Layer(arr[i], arr[i+1]) for i in range(len(nouts))] # [Layer(3, 4), Layer(4, 4), Layer(4, 1)]
     def __call__(self, x):
         for layer in self.layers:
-            x = layer(x)
+            x = layer(x) # x = xs[i]
         return x
-    def parameters(self): # returns all the weights and biases from inside each node of entire nn
+    def parameters(self): # returns all the weights and biases from inside each neuron
         params = []
         for layer in self.layers:
             ps = layer.parameters()
@@ -202,6 +202,7 @@ class MLP:
         return params
 
 ## Binary Classification (-1.0 or 1.0)
+# https://i.imgur.com/7sbLKV3.png
 xs = [
     [2.0, 3.0, -1.0], # target: 1.0
     [3.0, -1.0, 0.5], # target: -1.0
@@ -212,15 +213,15 @@ ys = [1.0, -1.0, -1.0, 1.0] # desired targets
 
 model = MLP(3, [4, 4, 1])
 
-steps = 500
+steps = 100
 ypred = []
-for k in range(steps):
+for step in range(steps):
     ## forward pass
     ypred = [model(x) for x in xs] # ypred is not quite accurate
     # so how do we tune the weights to better predict the desired targets?
     # loss measures the total performance of nn
     ## calculate loss (using simple mean square error loss)
-    loss = sum([(yout - ygt)**2 for ygt, yout in zip(ys, ypred)]) # pyright: reportGeneralTypeIssues=false
+    loss = sum([(yout - ygt)**2 for ygt, yout in zip(ys, ypred)])
     ## backward pass (calculate gradients), but do zero grad before
     for p in model.parameters():
         p.grad = 0.0
@@ -229,7 +230,7 @@ for k in range(steps):
     for p in model.parameters():
         p.data += -0.1 * p.grad
     ## print loss
-    if k % (steps/10) == 0:
-        print(k, loss.data)
+    if step % (steps/10) == 0:
+        print(f'step: {step}, loss: {loss.data}')
 
 for i in ypred: print(i)
