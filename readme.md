@@ -33,13 +33,10 @@ conda deactivate
   conda create --prefix ./env python=3.8
   conda activate ./env
   ```
-  5. Install PyTorch.
+  5. Install must have packages.
   ```bash
-  pip3 install torch torchvision torchaudio
-  ```
-  6. Install common data science packages.
-  ```bash
-  conda install pandas numpy matplotlib scikit-learn pydot pydotplus tqdm
+  conda install pytorch-nightly::pytorch torchvision torchaudio -c pytorch-nightly
+  conda install pandas numpy matplotlib scikit-learn notebook
   ```
 </details>
 
