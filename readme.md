@@ -17,7 +17,7 @@ conda deactivate
 ```
 
 <details>
-  <summary>PyTorch setup for M1</summary>
+  <summary>Setup</summary>
   <br>
 
   1. [Download Miniforge3](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-arm64.sh) (Conda installer) for macOS arm64 chips (M1, M1 Pro, M1 Max).
