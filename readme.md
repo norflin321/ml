@@ -17,7 +17,7 @@ conda deactivate
 ```
 
 <details>
-  <summary>PyTorch setup for M1</summary>
+  <summary>Setup</summary>
   <br>
 
   1. [Download Miniforge3](https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-arm64.sh) (Conda installer) for macOS arm64 chips (M1, M1 Pro, M1 Max).
@@ -33,13 +33,10 @@ conda deactivate
   conda create --prefix ./env python=3.8
   conda activate ./env
   ```
-  5. Install PyTorch.
+  5. Install must have packages.
   ```bash
-  pip3 install torch torchvision torchaudio
-  ```
-  6. Install common data science packages.
-  ```bash
-  conda install pandas numpy matplotlib scikit-learn pydot pydotplus tqdm
+  conda install pytorch-nightly::pytorch torchvision torchaudio -c pytorch-nightly
+  conda install pandas numpy matplotlib scikit-learn notebook
   ```
 </details>
 
