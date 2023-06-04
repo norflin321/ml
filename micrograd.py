@@ -9,9 +9,6 @@
 # formula: (f(x+h) - f(x)) / h
 
 import math
-from utils import draw_dot
-import matplotlib.pyplot as plt
-import subprocess
 import numpy as np
 
 class Value:
@@ -233,4 +230,7 @@ for step in range(steps):
     if step % (steps/10) == 0:
         print(f'step: {step}, loss: {loss.data}')
 
-for i in ypred: print(i)
+# for i in ypred: print(i)
+
+x = 2
+print((math.exp(2*x) - 1) / (math.exp(2*x) + 1))

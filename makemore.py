@@ -47,7 +47,7 @@ for k in range(steps):
     w.grad = None # zero grad
     loss.backward()
     ## update
-    w.data += -50 * w.grad # pyright: reportGeneralTypeIssues=false
+    w.data += -50 * w.grad
 
 ## sample
 for i in range(5):
