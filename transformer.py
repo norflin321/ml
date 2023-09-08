@@ -77,6 +77,7 @@ class Head(nn.Module):
         self.query = nn.Linear(n_embd, head_size, bias=False)
         self.value = nn.Linear(n_embd, head_size, bias=False)
         self.register_buffer('tril', torch.tril(torch.ones(block_size, block_size)))
+
         self.dropout = nn.Dropout(dropout)
     def forward(self, x):
         # input of size (batch, time-step, channels)

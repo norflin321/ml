@@ -35,7 +35,8 @@ c = torch.randn((27, 2))
 # but c[0] is an array of 2 random numbers, so each character of context will be
 # represented as an array of two random numbers
 emb = c[x]
-print("emb:", emb.shape) # [32, 3, 2]
+print("emb:", emb)
+print("emb shape:", emb.shape) # [32, 3, 2]
 
 ## create random weights and biases for first layer
 w1 = torch.randn((6, 100))
