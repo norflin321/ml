@@ -41,3 +41,4 @@ conda deactivate
 </details>
 
 - https://colab.research.google.com/github/ - open any notebook from github in colab select GPU and train faster
+- `jupyter nbconvert --clear-output --inplace notebook.ipynb` - clear notebook output in all cells
