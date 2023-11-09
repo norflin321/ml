@@ -91,7 +91,7 @@ ui = gr.Interface(
     gr.Number(label="Сид (seed)", value=-1),
   ],
   outputs=[
-    gr.Image(label="Результат (generation result)"),
+    gr.Image(label="Результат (generation result)", show_download_button=False),
     gr.Markdown(value=""),
   ],
   description="Описание и инструкция будут тут ...",
