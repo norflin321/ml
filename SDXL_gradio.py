@@ -97,7 +97,7 @@ ui = gr.Interface(
     gr.Image(label="Результат (generation result)"),
     gr.Markdown(value=""),
   ],
-  description="SDXL",
+  description="Stable Diffusion XL 1.0",
   allow_flagging=False,
 )
 
