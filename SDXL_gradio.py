@@ -1,5 +1,7 @@
 # pip install -U git+https://github.com/huggingface/diffusers.git controlnet_aux==0.0.7 > install_logs.txt
 # pip install transformers accelerate safetensors mediapipe invisible_watermark gradio > install_logs.txt
+# https://civitai.com/search/models?sortBy=models_v3&query=lora%20sdxl - find more lora weights (base model should be SDXL 1.0, don't forget to use trigger words)
+# ipconfig getifaddr en0 - get local network ip (gradio ui is available on any computer on that local network)
 
 import gradio as gr
 from os import listdir
@@ -17,8 +19,8 @@ import gc
 
 euler_a = EulerAncestralDiscreteScheduler.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0", subfolder="scheduler")
 vae = AutoencoderKL.from_pretrained("madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16)
-adapter = T2IAdapter.from_pretrained("TencentARC/t2i-adapter-sketch-sdxl-1.0", torch_dtype=torch.float16, varient="fp16").to("cuda")
 pidinet = PidiNetDetector.from_pretrained("lllyasviel/Annotators").to("cuda")
+adapter = T2IAdapter.from_pretrained("TencentARC/t2i-adapter-sketch-sdxl-1.0", torch_dtype=torch.float16, varient="fp16").to("cuda")
 
 results_url = "C:/Users/user/Desktop/ML/SDXL_results"
 finetunes_url = "C:/Users/user/Desktop/ML/finetune_results"
@@ -94,9 +96,9 @@ ui = gr.Interface(
     gr.Image(label="Результат (generation result)"),
     gr.Markdown(value=""),
   ],
-  description="Описание и инструкция будут тут ...",
+  description="SDXL",
   allow_flagging=False,
 )
 
 if __name__ == "__main__":
-  ui.launch(show_api=False, inbrowser=True)
+  ui.launch(show_api=False, inbrowser=True, show_error=True, server_name="0.0.0.0")
