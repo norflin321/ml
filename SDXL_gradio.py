@@ -64,7 +64,8 @@ def generate(sketch_img, finetune_filename, prompt, negative_prompt, steps, guid
   else:
     load_pipe("txt2img", finetune_filename)
     result = pipe(prompt=prompt, negative_prompt=negative_prompt, num_inference_steps=steps, guidance_scale=guidance, generator=generator).images[0]
-  file_path = f"{results_url}/{datetime.datetime.now().strftime('%y.%m.%d_%H-%M-%S')}_{current_seed}.png"
+  time_now = datetime.datetime.now().strftime("%y.%m.%d_%H-%M-%S")
+  file_path = f"{results_url}/{time_now}_{current_seed}.png"
   result.save(file_path)
   return [
     result,
@@ -89,7 +90,7 @@ ui = gr.Interface(
     gr.Textbox(label="Негативный промпт (negative prompt)", value=default_negative_prompt),
     gr.Slider(label="Шаги (steps)", minimum=0, maximum=50, step=1, value=50),
     gr.Slider(label="Строгость промпта (guidance)", minimum=0, maximum=10, step=0.5, value=8),
-    gr.Slider( label="Строгость скетча (sketch adapter guidance)", minimum=0, maximum=1, step=0.1, value=0.9),
+    gr.Slider(label="Строгость скетча (sketch adapter guidance)", minimum=0, maximum=1, step=0.1, value=0.9),
     gr.Number(label="Сид (seed)", value=-1),
   ],
   outputs=[
