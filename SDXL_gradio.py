@@ -62,13 +62,19 @@ def generate(sketch_img, finetune_filename, prompt, negative_prompt, steps, guid
   else:
     load_pipe("txt2img", finetune_filename)
     result = pipe(prompt=prompt, negative_prompt=negative_prompt, num_inference_steps=steps, guidance_scale=guidance, generator=generator).images[0]
-  result.save(f"{results_url}/{datetime.datetime.now().strftime('%y.%m.%d_%H-%M-%S')}_{current_seed}.png")
+  file_path = f"{results_url}/{datetime.datetime.now().strftime('%y.%m.%d_%H-%M-%S')}_{current_seed}.png"
+  result.save(file_path)
   return [
     result,
     f"""
-    Сохранено в ... {123}
-    123
-    asdf
+    Изображение сохранено в {file_path}
+    - Файнтюн версия: {finetune_filename}
+    - Промпт: {prompt}
+    - Негативный промпт: {negative_prompt}
+    - Шаги: {steps}
+    - Строгость промпта: {guidance}
+    - Строгость скетча: {adapter_guidance}
+    - Сид: {current_seed}
     """
   ]
 
