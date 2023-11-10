@@ -1,7 +1,6 @@
 # pip install -U git+https://github.com/huggingface/diffusers.git controlnet_aux==0.0.7 > install_logs.txt
 # pip install transformers accelerate safetensors mediapipe invisible_watermark gradio > install_logs.txt
 # https://civitai.com/search/models?sortBy=models_v3&query=lora%20sdxl - find more lora weights (base model should be SDXL 1.0, don't forget to use trigger words)
-# ipconfig getifaddr en0 - get local network ip (gradio ui is available on any computer on that local network)
 
 import gradio as gr
 from os import listdir
@@ -19,8 +18,8 @@ import gc
 
 euler_a = EulerAncestralDiscreteScheduler.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0", subfolder="scheduler")
 vae = AutoencoderKL.from_pretrained("madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16)
-pidinet = PidiNetDetector.from_pretrained("lllyasviel/Annotators").to("cuda")
 adapter = T2IAdapter.from_pretrained("TencentARC/t2i-adapter-sketch-sdxl-1.0", torch_dtype=torch.float16, varient="fp16").to("cuda")
+pidinet = PidiNetDetector.from_pretrained("lllyasviel/Annotators").to("cuda")
 
 results_url = "C:/Users/user/Desktop/ML/SDXL_results"
 finetunes_url = "C:/Users/user/Desktop/ML/finetune_results"
@@ -90,12 +89,13 @@ ui = gr.Interface(
     gr.Textbox(label="Негативный промпт (negative prompt)", value=default_negative_prompt),
     gr.Slider(label="Шаги (steps)", minimum=0, maximum=50, step=1, value=50),
     gr.Slider(label="Строгость промпта (guidance)", minimum=0, maximum=10, step=0.5, value=8),
-    gr.Slider(label="Строгость скетча (sketch adapter guidance)", minimum=0, maximum=1, step=0.1, value=0.9),
+    gr.Slider( label="Строгость скетча (sketch adapter guidance)", minimum=0, maximum=1, step=0.1, value=0.9),
     gr.Number(label="Сид (seed)", value=-1),
   ],
   outputs=[
     gr.Image(label="Результат (generation result)"),
-    gr.Markdown(value=""),
+        gr.Markdown(value="")
+
   ],
   description="Stable Diffusion XL 1.0",
   allow_flagging=False,
