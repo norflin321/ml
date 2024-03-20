@@ -38,7 +38,10 @@ conda deactivate
   conda install pytorch-nightly::pytorch torchvision torchaudio -c pytorch-nightly
   conda install pandas numpy matplotlib scikit-learn notebook
   ```
+
 </details>
 
 - https://colab.research.google.com/github/ - open any notebook from github in colab select GPU and train faster
 - `jupyter nbconvert --clear-output --inplace notebook.ipynb` - clear notebook output in all cells
+
+![236611118-06eccf2f-acd0-4428-927a-13b9ba4ff586](https://github.com/norflin321/ml/assets/33498670/e612d2cf-ec2a-40e4-b6c7-13fec3b80179)
